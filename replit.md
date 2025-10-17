@@ -1,0 +1,90 @@
+# Overview
+
+This is an AI chat assistant application built with Next.js 15 and the assistant-ui library. The application provides a conversational interface with multiple AI models, featuring a thread-based chat system with model selection capabilities. Users can interact with various free AI models through OpenRouter, with support for markdown rendering, code syntax highlighting, and file attachments.
+
+## Recent Changes (October 17, 2025)
+
+- **Migrated from Vercel to Replit**: Configured Next.js to run on Replit with proper port (5000) and host (0.0.0.0) binding
+- **Switched from OpenAI to OpenRouter**: Replaced `@ai-sdk/openai` with `@openrouter/ai-sdk-provider`
+- **Added Model Selector UI**: Created interactive dropdown showing 8 free OpenRouter models
+- **Environment Configuration**: Using `.env` for API key storage (gitignored for security)
+- **Deployment Ready**: Configured autoscale deployment for production
+
+# User Preferences
+
+Preferred communication style: Simple, everyday language.
+
+# System Architecture
+
+## Frontend Architecture
+
+**Framework**: Next.js 15 with App Router and React Server Components (RSC)
+- Uses the modern Next.js App Router architecture with TypeScript
+- Implements client-side state management with Zustand for chat runtime
+- Turbopack enabled for faster development builds
+
+**UI Component System**: 
+- Built on Radix UI primitives for accessible, unstyled components
+- Shadcn/ui component library with "new-york" style preset
+- Tailwind CSS v4 for styling with custom design tokens
+- Framer Motion for animations and transitions
+
+**Chat Interface Architecture**:
+- **assistant-ui**: Core chat functionality with React hooks and primitives
+- **Thread-based conversations**: Multiple conversation threads with persistence
+- **Model switching**: Dynamic model selection from free OpenRouter models
+- **Markdown rendering**: Full markdown support with syntax highlighting via react-shiki
+- **Attachment support**: File upload and display capabilities
+- **Responsive design**: Mobile-first with collapsible sidebar navigation
+
+## Backend Architecture
+
+**API Layer**:
+- Next.js API Routes (App Router convention)
+- Single `/api/chat` endpoint handles all chat interactions
+- Streaming responses using Vercel AI SDK's `streamText` function
+
+**AI Integration**:
+- Primary provider: OpenRouter via `@openrouter/ai-sdk-provider`
+- Vercel AI SDK for model abstraction and streaming
+- Support for multiple free AI models (DeepSeek, Llama, Venice, etc.)
+- Model configuration stored in `/lib/free-models.ts`
+
+**State Management**:
+- Client-side: Zustand for runtime state
+- Chat runtime: `@assistant-ui/react-ai-sdk` with `useChatRuntime` hook
+- Thread management: Built into assistant-ui primitives
+
+## External Dependencies
+
+**AI Services**:
+- **OpenRouter**: Primary AI model provider
+  - API endpoint for model inference
+  - Supports 8 free tier models: DeepSeek R1, DeepSeek V3, Llama 4 Maverick, Venice Uncensored, Kimi VL, Mistral Small 3.1, NVIDIA Nemotron
+  - Requires `OPENROUTER_API_KEY` environment variable
+  - Free models list maintained in `/lib/free-models.ts`
+
+**Third-party Libraries**:
+- **Vercel AI SDK (`ai`)**: Model abstraction and streaming utilities
+- **assistant-ui**: Complete chat UI framework with React primitives
+- **Radix UI**: Headless UI components (Dialog, Tooltip, Separator, Avatar, Slot)
+- **Framer Motion**: Animation library for smooth transitions
+- **react-shiki**: Code syntax highlighting in markdown
+- **remark-gfm**: GitHub Flavored Markdown support
+- **Lucide React**: Icon library
+
+**Development Tools**:
+- **TypeScript**: Type safety across the application
+- **ESLint**: Code linting with Next.js config
+- **Prettier**: Code formatting with Tailwind plugin
+- **Tailwind CSS v4**: Utility-first CSS framework
+
+**Replit Environment Setup**:
+- **Package Manager**: pnpm (installed globally)
+- **Node.js**: Version 20
+- **Port Configuration**: 5000 with 0.0.0.0 host binding for Replit compatibility
+- **Environment Variables**:
+  - Development: `.env` file (gitignored, see `.env.example` for template)
+  - Production: Set `OPENROUTER_API_KEY` in Replit Secrets
+- **Deployment**: Autoscale deployment configured with `pnpm run build` → `pnpm run start`
+- **Dev Server**: `pnpm run dev` with Turbopack enabled
