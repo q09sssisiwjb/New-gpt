@@ -1,4 +1,4 @@
-modules = ["nodejs-20"]
+modules = ["nodejs-20", "web"]
 
 [agent]
 expertMode = true
@@ -43,3 +43,6 @@ externalPort = 3001
 deploymentTarget = "autoscale"
 run = ["bash", "-c", "cd my-app && pnpm run start"]
 build = ["bash", "-c", "cd my-app && pnpm run build"]
+
+[nix]
+channel = "stable-25_05"
