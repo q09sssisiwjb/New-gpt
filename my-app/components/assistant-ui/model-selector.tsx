@@ -79,10 +79,10 @@ export const ModelSelector = ({ selectedModel, onModelChange }: ModelSelectorPro
       {isOpen && (
         <>
           <div 
-            className="fixed inset-0 z-10" 
+            className="fixed inset-0 z-40" 
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute top-full left-0 mt-2 w-96 bg-popover border rounded-lg shadow-lg z-20 max-h-[500px] overflow-y-auto">
+          <div className="absolute top-full right-0 mt-2 w-[calc(100vw-2rem)] sm:w-96 bg-popover border rounded-lg shadow-lg z-50 max-h-[500px] overflow-y-auto">
             <div className="p-2">
               <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
                 Free OpenRouter Models ({models.length})

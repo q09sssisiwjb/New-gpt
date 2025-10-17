@@ -39,6 +39,10 @@ externalPort = 3000
 localPort = 36925
 externalPort = 3001
 
+[[ports]]
+localPort = 45473
+externalPort = 3003
+
 [deployment]
 deploymentTarget = "autoscale"
 run = ["bash", "-c", "cd my-app && pnpm run start"]
