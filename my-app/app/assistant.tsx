@@ -21,11 +21,18 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { ModelSelector } from "@/components/assistant-ui/model-selector";
+import { useState } from "react";
 
 export const Assistant = () => {
+  const [selectedModel, setSelectedModel] = useState("deepseek/deepseek-r1:free");
+
   const runtime = useChatRuntime({
     transport: new AssistantChatTransport({
       api: "/api/chat",
+      body: {
+        model: selectedModel,
+      },
     }),
   });
 
@@ -42,19 +49,25 @@ export const Assistant = () => {
                 <BreadcrumbList>
                   <BreadcrumbItem className="hidden md:block">
                     <BreadcrumbLink
-                      href="https://www.assistant-ui.com/docs/getting-started"
+                      href="https://openrouter.ai/models/?q=free"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      Build Your Own ChatGPT UX
+                      OpenRouter Free Models
                     </BreadcrumbLink>
                   </BreadcrumbItem>
                   <BreadcrumbSeparator className="hidden md:block" />
                   <BreadcrumbItem>
-                    <BreadcrumbPage>Starter Template</BreadcrumbPage>
+                    <BreadcrumbPage>AI Assistant</BreadcrumbPage>
                   </BreadcrumbItem>
                 </BreadcrumbList>
               </Breadcrumb>
+              <div className="ml-auto">
+                <ModelSelector 
+                  selectedModel={selectedModel}
+                  onModelChange={setSelectedModel}
+                />
+              </div>
             </header>
             <div className="flex-1 overflow-hidden">
               <Thread />

@@ -1,10 +1,13 @@
-import { openai } from "@ai-sdk/openai";
+import { openrouter } from "@openrouter/ai-sdk-provider";
 import { streamText, UIMessage, convertToModelMessages } from "ai";
 
 export async function POST(req: Request) {
-  const { messages }: { messages: UIMessage[] } = await req.json();
+  const { messages, model }: { messages: UIMessage[]; model?: string } = await req.json();
+  
+  const selectedModel = model || "deepseek/deepseek-r1:free";
+  
   const result = streamText({
-    model: openai("gpt-5-nano"),
+    model: openrouter(selectedModel),
     messages: convertToModelMessages(messages),
   });
 
