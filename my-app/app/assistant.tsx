@@ -25,7 +25,7 @@ import { ModelSelector } from "@/components/assistant-ui/model-selector";
 import { useState } from "react";
 
 export const Assistant = () => {
-  const [selectedModel, setSelectedModel] = useState("deepseek/deepseek-r1:free");
+  const [selectedModel, setSelectedModel] = useState("meta-llama/llama-4-maverick:free");
 
   const runtime = useChatRuntime({
     transport: new AssistantChatTransport({
