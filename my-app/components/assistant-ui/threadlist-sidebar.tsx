@@ -1,9 +1,12 @@
+"use client";
+
 import * as React from "react";
 import { MessagesSquare } from "lucide-react";
 import Link from "next/link";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -11,10 +14,18 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { ThreadList } from "@/components/assistant-ui/thread-list";
+import { UserProfile } from "@/components/auth/UserProfile";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { AuthModal } from "@/components/auth/AuthModal";
+import { LogIn } from "lucide-react";
 
 export function ThreadListSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
+  const { user, loading } = useAuth();
+  const [showAuthModal, setShowAuthModal] = React.useState(false);
+
   return (
     <Sidebar {...props}>
       <SidebarHeader className="aui-sidebar-header mb-2 border-b">
@@ -45,6 +56,27 @@ export function ThreadListSidebar({
         <ThreadList />
       </SidebarContent>
       <SidebarRail />
+      <SidebarFooter>
+        {!loading && (
+          <>
+            {user ? (
+              <UserProfile />
+            ) : (
+              <div className="p-4 border-t">
+                <Button
+                  onClick={() => setShowAuthModal(true)}
+                  className="w-full"
+                  variant="outline"
+                >
+                  <LogIn className="mr-2 h-4 w-4" />
+                  Sign In
+                </Button>
+              </div>
+            )}
+          </>
+        )}
+      </SidebarFooter>
+      <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
     </Sidebar>
   );
 }
