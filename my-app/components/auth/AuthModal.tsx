@@ -47,8 +47,8 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
       setEmail('');
       setPassword('');
       setDisplayName('');
-    } catch (err: any) {
-      setError(err.message || 'An error occurred');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
     }
@@ -60,8 +60,8 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
     try {
       await signInWithGoogle();
       onClose();
-    } catch (err: any) {
-      setError(err.message || 'Failed to sign in with Google');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to sign in with Google');
     } finally {
       setLoading(false);
     }
@@ -161,7 +161,7 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
           <div className="text-center text-sm">
             {isLogin ? (
               <p>
-                Don't have an account?{' '}
+                Don&apos;t have an account?{' '}
                 <button
                   type="button"
                   onClick={() => setIsLogin(false)}

@@ -3,12 +3,7 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { LogOut, User } from 'lucide-react';
-import {
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-} from '@/components/ui/sidebar';
+import { LogOut } from 'lucide-react';
 
 export const UserProfile = () => {
   const { user, logout } = useAuth();
