@@ -1,5 +1,27 @@
 import { NextResponse } from 'next/server';
 
+interface OpenRouterModel {
+  id: string;
+  name?: string;
+  context_length?: number;
+  description?: string;
+  pricing?: {
+    prompt?: string | number;
+    completion?: string | number;
+  };
+}
+
+interface ProcessedModel {
+  id: string;
+  name: string;
+  context_length: number;
+  description: string;
+}
+
+interface OpenRouterResponse {
+  data: OpenRouterModel[];
+}
+
 export async function GET() {
   try {
     const apiKey = process.env.OPENROUTER_API_KEY;
@@ -21,21 +43,21 @@ export async function GET() {
       throw new Error(`OpenRouter API error: ${response.status}`);
     }
 
-    const data = await response.json();
+    const data = await response.json() as OpenRouterResponse;
     
     const freeModels = data.data
-      .filter((model: any) => 
+      .filter((model: OpenRouterModel) => 
         model.pricing?.prompt === '0' || 
         model.pricing?.prompt === 0 ||
         model.id.includes(':free')
       )
-      .map((model: any) => ({
+      .map((model: OpenRouterModel): ProcessedModel => ({
         id: model.id,
         name: model.name || model.id,
         context_length: model.context_length || 0,
         description: model.description || 'No description available',
       }))
-      .sort((a: any, b: any) => b.context_length - a.context_length);
+      .sort((a: ProcessedModel, b: ProcessedModel) => b.context_length - a.context_length);
 
     return NextResponse.json({ models: freeModels });
   } catch (error) {
