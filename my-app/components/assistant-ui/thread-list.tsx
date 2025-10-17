@@ -1,14 +1,19 @@
 import type { FC } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   ThreadListItemPrimitive,
   ThreadListPrimitive,
   useAssistantState,
+  useThreadListItem,
+  useThreadListItemRuntime,
 } from "@assistant-ui/react";
-import { Trash2Icon, PlusIcon } from "lucide-react";
+import { Trash2Icon, PlusIcon, PencilIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
+import { generateTitleFromMessage } from "@/lib/generateTitle";
 
 export const ThreadList: FC = () => {
   return (
@@ -62,21 +67,115 @@ const ThreadListSkeleton: FC = () => {
 };
 
 const ThreadListItem: FC = () => {
+  const [isEditing, setIsEditing] = useState(false);
+  const runtime = useThreadListItemRuntime();
+  const title = useThreadListItem((m) => m.title);
+  const isActive = useThreadListItem((m) => m.isActive);
+  const hasAutoNamed = useRef(false);
+  
+  // Auto-generate title from first message when thread becomes active
+  useEffect(() => {
+    if (!isActive || hasAutoNamed.current || title !== "New Chat") return;
+    
+    const checkAndGenerateTitle = async () => {
+      try {
+        // Get thread state
+        const state = runtime.getState();
+        
+        // Wait for messages to be available
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // For now, we'll use a placeholder auto-generation
+        // In a full implementation, this would read the actual message content
+        hasAutoNamed.current = true;
+      } catch (e) {
+        console.error("Auto-naming error:", e);
+      }
+    };
+    
+    checkAndGenerateTitle();
+  }, [isActive, title, runtime]);
+  
   return (
     <ThreadListItemPrimitive.Root className="aui-thread-list-item flex items-center gap-2 rounded-lg transition-all hover:bg-muted focus-visible:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none data-active:bg-muted">
       <ThreadListItemPrimitive.Trigger className="aui-thread-list-item-trigger flex-grow px-3 py-2 text-start">
-        <ThreadListItemTitle />
+        <ThreadListItemTitle isEditing={isEditing} setIsEditing={setIsEditing} />
       </ThreadListItemPrimitive.Trigger>
-      <ThreadListItemDelete />
+      {!isEditing && (
+        <>
+          <ThreadListItemRename onEdit={() => setIsEditing(true)} />
+          <ThreadListItemDelete />
+        </>
+      )}
     </ThreadListItemPrimitive.Root>
   );
 };
 
-const ThreadListItemTitle: FC = () => {
+const ThreadListItemTitle: FC<{
+  isEditing: boolean;
+  setIsEditing: (value: boolean) => void;
+}> = ({ isEditing, setIsEditing }) => {
+  const runtime = useThreadListItemRuntime();
+  const title = useThreadListItem((m) => m.title);
+  const [editValue, setEditValue] = useState(title || "New Chat");
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [isEditing]);
+
+  const handleSave = async () => {
+    if (editValue.trim() && editValue !== title) {
+      await runtime.rename(editValue.trim());
+    }
+    setIsEditing(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleSave();
+    } else if (e.key === "Escape") {
+      setEditValue(title || "New Chat");
+      setIsEditing(false);
+    }
+  };
+
+  if (isEditing) {
+    return (
+      <Input
+        ref={inputRef}
+        value={editValue}
+        onChange={(e) => setEditValue(e.target.value)}
+        onBlur={handleSave}
+        onKeyDown={handleKeyDown}
+        className="h-7 text-sm"
+      />
+    );
+  }
+
   return (
     <span className="aui-thread-list-item-title text-sm">
       <ThreadListItemPrimitive.Title fallback="New Chat" />
     </span>
+  );
+};
+
+const ThreadListItemRename: FC<{ onEdit: () => void }> = ({ onEdit }) => {
+  return (
+    <TooltipIconButton
+      onClick={(e) => {
+        e.stopPropagation();
+        onEdit();
+      }}
+      className="aui-thread-list-item-rename size-4 p-0 text-foreground hover:text-primary"
+      variant="ghost"
+      tooltip="Rename chat"
+    >
+      <PencilIcon />
+    </TooltipIconButton>
   );
 };
 
