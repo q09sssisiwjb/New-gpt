@@ -10,11 +10,13 @@ import {
   where, 
   orderBy, 
   serverTimestamp,
-  Timestamp 
+  writeBatch,
+  limit
 } from 'firebase/firestore';
 import { db } from './firebase';
 
 export interface ChatMessage {
+  id: string;
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
@@ -24,7 +26,6 @@ export interface ChatThread {
   id: string;
   userId: string;
   title: string;
-  messages: ChatMessage[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -34,7 +35,6 @@ export const chatHistoryService = {
     const threadRef = await addDoc(collection(db, 'chatThreads'), {
       userId,
       title,
-      messages: [],
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     });
@@ -55,7 +55,6 @@ export const chatHistoryService = {
         id: doc.id,
         userId: data.userId,
         title: data.title,
-        messages: data.messages || [],
         createdAt: data.createdAt?.toDate() || new Date(),
         updatedAt: data.updatedAt?.toDate() || new Date(),
       };
@@ -75,15 +74,30 @@ export const chatHistoryService = {
       id: docSnap.id,
       userId: data.userId,
       title: data.title,
-      messages: data.messages || [],
       createdAt: data.createdAt?.toDate() || new Date(),
       updatedAt: data.updatedAt?.toDate() || new Date(),
     };
   },
 
+  async getMessages(threadId: string): Promise<ChatMessage[]> {
+    const messagesRef = collection(db, 'chatThreads', threadId, 'messages');
+    const q = query(messagesRef, orderBy('timestamp', 'asc'));
+    
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        role: data.role,
+        content: data.content,
+        timestamp: data.timestamp?.toDate() || new Date(),
+      };
+    });
+  },
+
   async updateThread(
     threadId: string, 
-    updates: { title?: string; messages?: ChatMessage[] }
+    updates: { title?: string }
   ): Promise<void> {
     const docRef = doc(db, 'chatThreads', threadId);
     await updateDoc(docRef, {
@@ -93,20 +107,55 @@ export const chatHistoryService = {
   },
 
   async deleteThread(threadId: string): Promise<void> {
-    const docRef = doc(db, 'chatThreads', threadId);
-    await deleteDoc(docRef);
+    const messagesRef = collection(db, 'chatThreads', threadId, 'messages');
+    
+    const deleteInBatches = async () => {
+      const batchSize = 500;
+      const q = query(messagesRef, limit(batchSize));
+      
+      const snapshot = await getDocs(q);
+      
+      if (snapshot.size === 0) {
+        return;
+      }
+      
+      const batch = writeBatch(db);
+      snapshot.docs.forEach((doc) => {
+        batch.delete(doc.ref);
+      });
+      
+      await batch.commit();
+      
+      if (snapshot.size === batchSize) {
+        await deleteInBatches();
+      }
+    };
+    
+    await deleteInBatches();
+    
+    const threadRef = doc(db, 'chatThreads', threadId);
+    await deleteDoc(threadRef);
   },
 
   async addMessage(
     threadId: string, 
-    message: ChatMessage
-  ): Promise<void> {
-    const thread = await this.getThread(threadId);
-    if (!thread) {
-      throw new Error('Thread not found');
-    }
+    message: Omit<ChatMessage, 'id' | 'timestamp'>
+  ): Promise<string> {
+    const batch = writeBatch(db);
     
-    const updatedMessages = [...thread.messages, message];
-    await this.updateThread(threadId, { messages: updatedMessages });
+    const messagesRef = collection(db, 'chatThreads', threadId, 'messages');
+    const messageRef = doc(messagesRef);
+    batch.set(messageRef, {
+      ...message,
+      timestamp: serverTimestamp(),
+    });
+    
+    const threadRef = doc(db, 'chatThreads', threadId);
+    batch.update(threadRef, {
+      updatedAt: serverTimestamp(),
+    });
+    
+    await batch.commit();
+    return messageRef.id;
   },
 };

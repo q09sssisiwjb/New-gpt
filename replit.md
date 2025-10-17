@@ -6,7 +6,10 @@ This is an AI chat assistant application built with Next.js 15 and the assistant
 
 - **Migrated from Vercel to Replit**: Configured Next.js to run on Replit with proper port (5000) and host (0.0.0.0) binding
 - **Switched from OpenAI to OpenRouter**: Replaced `@ai-sdk/openai` with `@openrouter/ai-sdk-provider`
-- **Added Model Selector UI**: Created interactive dropdown showing 8 free OpenRouter models
+- **Added Model Selector UI**: Created interactive dropdown showing 8 free OpenRouter models (fixed mobile responsiveness)
+- **Firebase Authentication**: Integrated Firebase Auth with email/password and Google sign-in
+- **User Profile System**: Added user profile display in sidebar with sign in/out functionality
+- **Chat History Storage**: Implemented Firestore-based chat history persistence
 - **Environment Configuration**: Using `.env` for API key storage (gitignored for security)
 - **Deployment Ready**: Configured autoscale deployment for production
 
@@ -50,10 +53,18 @@ Preferred communication style: Simple, everyday language.
 - Support for multiple free AI models (DeepSeek, Llama, Venice, etc.)
 - Model configuration stored in `/lib/free-models.ts`
 
+**Authentication & Data Persistence**:
+- **Firebase Authentication**: Email/password and Google OAuth sign-in
+- **User Context**: React Context API (`AuthContext`) for auth state management
+- **Firestore Database**: Chat history and thread storage per user
+- **Chat History Service**: CRUD operations in `/lib/chatHistory.ts`
+- **User Profile**: Display in sidebar with avatar and sign out capability
+
 **State Management**:
 - Client-side: Zustand for runtime state
 - Chat runtime: `@assistant-ui/react-ai-sdk` with `useChatRuntime` hook
 - Thread management: Built into assistant-ui primitives
+- Auth state: Firebase `onAuthStateChanged` listener
 
 ## External Dependencies
 
