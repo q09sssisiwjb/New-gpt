@@ -34,6 +34,7 @@ import {
 } from "@/components/assistant-ui/attachment";
 
 import { cn } from "@/lib/utils";
+import { AutoTitleGenerator } from "@/components/assistant-ui/auto-title-generator";
 
 export const Thread: FC = () => {
   return (
@@ -45,6 +46,7 @@ export const Thread: FC = () => {
             ["--thread-max-width" as string]: "44rem",
           }}
         >
+          <AutoTitleGenerator />
           <ThreadPrimitive.Viewport className="aui-thread-viewport relative flex flex-1 flex-col overflow-x-auto overflow-y-scroll px-4">
             <ThreadPrimitive.If empty>
               <ThreadWelcome />
