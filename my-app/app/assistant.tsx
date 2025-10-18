@@ -49,6 +49,7 @@ export const Assistant = () => {
 
   const customApiKeyData = useMemo(() => {
     return customApiKeyStorage.get();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [customKeyTimestamp]);
 
   const runtime = useChatRuntime({

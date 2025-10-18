@@ -118,8 +118,8 @@ export function CustomModelDialog({ isOpen, onClose, onSave }: CustomModelDialog
           <div className="rounded-lg bg-muted p-3 text-xs space-y-1">
             <p className="font-medium">🔒 Privacy & Security</p>
             <p className="text-muted-foreground">
-              Your API key is stored only in your browser's local storage and is never sent to our servers. 
-              It's only used to make direct requests to OpenRouter on your behalf.
+              Your API key is stored only in your browser&apos;s local storage and is never sent to our servers. 
+              It&apos;s only used to make direct requests to OpenRouter on your behalf.
             </p>
           </div>
         </div>
