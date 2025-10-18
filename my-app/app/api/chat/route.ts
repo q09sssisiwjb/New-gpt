@@ -1,13 +1,33 @@
 import { openrouter } from "@openrouter/ai-sdk-provider";
 import { streamText, UIMessage, convertToModelMessages } from "ai";
+import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 
 export async function POST(req: Request) {
-  const { messages, model }: { messages: UIMessage[]; model?: string } = await req.json();
+  const { 
+    messages, 
+    model,
+    customApiKey,
+    customModelId 
+  }: { 
+    messages: UIMessage[]; 
+    model?: string;
+    customApiKey?: string;
+    customModelId?: string;
+  } = await req.json();
   
-  const selectedModel = model || "deepseek/deepseek-r1:free";
+  const selectedModel = customModelId || model || "deepseek/deepseek-r1:free";
+  
+  let provider;
+  if (customApiKey) {
+    provider = createOpenRouter({
+      apiKey: customApiKey
+    });
+  } else {
+    provider = openrouter;
+  }
   
   const result = streamText({
-    model: openrouter(selectedModel),
+    model: provider(selectedModel),
     messages: convertToModelMessages(messages),
   });
 

@@ -22,16 +22,44 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { ModelSelector } from "@/components/assistant-ui/model-selector";
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { customApiKeyStorage } from "@/lib/customApiKey";
 
 export const Assistant = () => {
   const [selectedModel, setSelectedModel] = useState("meta-llama/llama-4-maverick:free");
+  const [customKeyTimestamp, setCustomKeyTimestamp] = useState(0);
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setCustomKeyTimestamp(Date.now());
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    
+    const handleCustomEvent = () => {
+      setCustomKeyTimestamp(Date.now());
+    };
+    window.addEventListener('customApiKeyUpdated', handleCustomEvent);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('customApiKeyUpdated', handleCustomEvent);
+    };
+  }, []);
+
+  const customApiKeyData = useMemo(() => {
+    return customApiKeyStorage.get();
+  }, [customKeyTimestamp]);
 
   const runtime = useChatRuntime({
     transport: new AssistantChatTransport({
       api: "/api/chat",
       body: {
         model: selectedModel,
+        ...(customApiKeyData && {
+          customApiKey: customApiKeyData.apiKey,
+          customModelId: customApiKeyData.modelId,
+        }),
       },
     }),
   });

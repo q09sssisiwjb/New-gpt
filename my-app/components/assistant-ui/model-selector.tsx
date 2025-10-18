@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { CustomModelDialog } from "./custom-model-dialog";
+import { customApiKeyStorage } from "@/lib/customApiKey";
 
 interface Model {
   id: string;
@@ -19,6 +21,8 @@ export const ModelSelector = ({ selectedModel, onModelChange }: ModelSelectorPro
   const [models, setModels] = useState<Model[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isCustomDialogOpen, setIsCustomDialogOpen] = useState(false);
+  const [hasCustomKey, setHasCustomKey] = useState(false);
 
   useEffect(() => {
     async function fetchModels() {
@@ -39,7 +43,12 @@ export const ModelSelector = ({ selectedModel, onModelChange }: ModelSelectorPro
     }
 
     fetchModels();
+    setHasCustomKey(customApiKeyStorage.hasCustomKey());
   }, []);
+
+  const handleCustomKeySaved = () => {
+    setHasCustomKey(customApiKeyStorage.hasCustomKey());
+  };
 
   const currentModel = models.find(m => m.id === selectedModel) || models[0] || { id: selectedModel, name: selectedModel };
 
@@ -127,9 +136,51 @@ export const ModelSelector = ({ selectedModel, onModelChange }: ModelSelectorPro
                 💡 All models are free. Rate limit: 50 req/day (1,000 with $10+ credits)
               </p>
             </div>
+            <div className="border-t p-2">
+              <button
+                onClick={() => {
+                  setIsOpen(false);
+                  setIsCustomDialogOpen(true);
+                }}
+                className="w-full flex items-center gap-2 px-3 py-2.5 rounded-md hover:bg-accent transition-colors text-sm"
+              >
+                <svg
+                  className="w-4 h-4 flex-shrink-0"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
+                  />
+                </svg>
+                <div className="flex-1 text-left">
+                  <div className="font-medium">
+                    Use Custom API Key
+                    {hasCustomKey && (
+                      <span className="ml-2 text-xs text-green-600 dark:text-green-400">
+                        ✓ Active
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    Use your own OpenRouter key for any model
+                  </div>
+                </div>
+              </button>
+            </div>
           </div>
         </>
       )}
+
+      <CustomModelDialog
+        isOpen={isCustomDialogOpen}
+        onClose={() => setIsCustomDialogOpen(false)}
+        onSave={handleCustomKeySaved}
+      />
     </div>
   );
 };
