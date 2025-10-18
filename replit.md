@@ -8,9 +8,11 @@ This is an AI chat assistant application built with Next.js 15 and the assistant
 - **Automatic Chat Title Generation**: AI-powered auto-titling feature (ChatGPT-style)
   - Automatically generates concise titles (5-7 words) from the first user message
   - Uses Mistral Small 3.1 free model via `/api/generate-title` endpoint
-  - Robust retry mechanism with exponential backoff handles Firebase persistence lag
-  - Graceful fallback to message truncation if AI generation fails
-  - Implemented in `AutoNameThreadItem` component with per-thread retry budget
+  - **localStorage-based persistence** - works without authentication or sign-in
+  - **Reactive updates** - sidebar updates instantly via custom event system
+  - Dual-component architecture: `AutoTitleGenerator` (generates) + `AutoNameThreadItem` (displays)
+  - Thread-aware state management - each new thread gets independent title generation
+  - Graceful error handling with automatic retries on failures
 
 ### October 17, 2025
 - **Migrated from Vercel to Replit**: Configured Next.js to run on Replit with proper port (5000) and host (0.0.0.0) binding
@@ -70,6 +72,8 @@ Preferred communication style: Simple, everyday language.
 - **Firestore Database**: Chat history and thread storage per user
 - **Chat History Service**: CRUD operations in `/lib/chatHistory.ts`
 - **User Profile**: Display in sidebar with avatar and sign out capability
+- **Title Storage**: localStorage-based persistence in `/lib/titleStorage.ts` (works without authentication)
+- **Custom Event System**: 'chat-title-updated' events for reactive UI updates across components
 
 **State Management**:
 - Client-side: Zustand for runtime state
