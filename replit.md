@@ -2,8 +2,17 @@
 
 This is an AI chat assistant application built with Next.js 15 and the assistant-ui library. The application provides a conversational interface with multiple AI models, featuring a thread-based chat system with model selection capabilities. Users can interact with various free AI models through OpenRouter, with support for markdown rendering, code syntax highlighting, and file attachments.
 
-## Recent Changes (October 17, 2025)
+## Recent Changes
 
+### October 18, 2025
+- **Automatic Chat Title Generation**: AI-powered auto-titling feature (ChatGPT-style)
+  - Automatically generates concise titles (5-7 words) from the first user message
+  - Uses Mistral Small 3.1 free model via `/api/generate-title` endpoint
+  - Robust retry mechanism with exponential backoff handles Firebase persistence lag
+  - Graceful fallback to message truncation if AI generation fails
+  - Implemented in `AutoNameThreadItem` component with per-thread retry budget
+
+### October 17, 2025
 - **Migrated from Vercel to Replit**: Configured Next.js to run on Replit with proper port (5000) and host (0.0.0.0) binding
 - **Switched from OpenAI to OpenRouter**: Replaced `@ai-sdk/openai` with `@openrouter/ai-sdk-provider`
 - **Added Model Selector UI**: Created interactive dropdown showing 8 free OpenRouter models (fixed mobile responsiveness)
@@ -35,6 +44,7 @@ Preferred communication style: Simple, everyday language.
 **Chat Interface Architecture**:
 - **assistant-ui**: Core chat functionality with React hooks and primitives
 - **Thread-based conversations**: Multiple conversation threads with persistence
+- **Automatic title generation**: AI-powered auto-titling from first user message (like ChatGPT)
 - **Model switching**: Dynamic model selection from free OpenRouter models
 - **Markdown rendering**: Full markdown support with syntax highlighting via react-shiki
 - **Attachment support**: File upload and display capabilities
@@ -44,8 +54,9 @@ Preferred communication style: Simple, everyday language.
 
 **API Layer**:
 - Next.js API Routes (App Router convention)
-- Single `/api/chat` endpoint handles all chat interactions
-- Streaming responses using Vercel AI SDK's `streamText` function
+- `/api/chat` endpoint handles all chat interactions with streaming responses
+- `/api/generate-title` endpoint generates concise chat titles using AI
+- `/api/models` endpoint provides available model list
 
 **AI Integration**:
 - Primary provider: OpenRouter via `@openrouter/ai-sdk-provider`
