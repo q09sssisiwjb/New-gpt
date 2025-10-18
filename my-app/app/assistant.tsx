@@ -87,7 +87,7 @@ export const Assistant = () => {
                   </BreadcrumbItem>
                   <BreadcrumbSeparator className="hidden md:block" />
                   <BreadcrumbItem>
-                    <BreadcrumbPage>AI Assistant</BreadcrumbPage>
+                    <BreadcrumbPage>new gpt</BreadcrumbPage>
                   </BreadcrumbItem>
                 </BreadcrumbList>
               </Breadcrumb>
