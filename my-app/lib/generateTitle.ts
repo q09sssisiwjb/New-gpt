@@ -1,4 +1,27 @@
-export function generateTitleFromMessage(message: string): string {
+export async function generateTitleFromMessage(message: string): Promise<string> {
+  try {
+    const response = await fetch('/api/generate-title', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ message }),
+    });
+
+    if (!response.ok) {
+      console.error('Failed to generate title:', response.statusText);
+      return fallbackTitle(message);
+    }
+
+    const data = await response.json();
+    return data.title || fallbackTitle(message);
+  } catch (error) {
+    console.error('Error generating title:', error);
+    return fallbackTitle(message);
+  }
+}
+
+function fallbackTitle(message: string): string {
   const cleanMessage = message.trim();
   
   if (cleanMessage.length === 0) {

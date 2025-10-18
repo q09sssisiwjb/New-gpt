@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
+import { AutoNameThreadItem } from "@/components/assistant-ui/auto-name-thread";
 
 export const ThreadList: FC = () => {
   return (
@@ -70,6 +71,7 @@ const ThreadListItem: FC = () => {
   
   return (
     <ThreadListItemPrimitive.Root className="aui-thread-list-item flex items-center gap-2 rounded-lg transition-all hover:bg-muted focus-visible:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none data-active:bg-muted">
+      <AutoNameThreadItem />
       <ThreadListItemPrimitive.Trigger className="aui-thread-list-item-trigger flex-grow px-3 py-2 text-start">
         <ThreadListItemTitle isEditing={isEditing} setIsEditing={setIsEditing} />
       </ThreadListItemPrimitive.Trigger>
