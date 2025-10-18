@@ -40,8 +40,8 @@ export const AutoTitleGenerator = () => {
     }
 
     const textContent = firstUserMessage.content
-      .filter((part: any) => part.type === 'text')
-      .map((part: any) => part.text)
+      .filter((part): part is { type: 'text'; text: string } => part.type === 'text')
+      .map((part) => part.text)
       .join(' ');
 
     if (!textContent.trim()) {
