@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
-import { generateTitleFromMessage } from "@/lib/generateTitle";
 
 export const ThreadList: FC = () => {
   return (
@@ -68,33 +67,6 @@ const ThreadListSkeleton: FC = () => {
 
 const ThreadListItem: FC = () => {
   const [isEditing, setIsEditing] = useState(false);
-  const runtime = useThreadListItemRuntime();
-  const title = useThreadListItem((m) => m.title);
-  const isActive = useThreadListItem((m) => m.isActive);
-  const hasAutoNamed = useRef(false);
-  
-  // Auto-generate title from first message when thread becomes active
-  useEffect(() => {
-    if (!isActive || hasAutoNamed.current || title !== "New Chat") return;
-    
-    const checkAndGenerateTitle = async () => {
-      try {
-        // Get thread state
-        const state = runtime.getState();
-        
-        // Wait for messages to be available
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        // For now, we'll use a placeholder auto-generation
-        // In a full implementation, this would read the actual message content
-        hasAutoNamed.current = true;
-      } catch (e) {
-        console.error("Auto-naming error:", e);
-      }
-    };
-    
-    checkAndGenerateTitle();
-  }, [isActive, title, runtime]);
   
   return (
     <ThreadListItemPrimitive.Root className="aui-thread-list-item flex items-center gap-2 rounded-lg transition-all hover:bg-muted focus-visible:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none data-active:bg-muted">
