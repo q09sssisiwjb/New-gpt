@@ -23,6 +23,7 @@ export const ModelSelector = ({ selectedModel, onModelChange }: ModelSelectorPro
   const [error, setError] = useState<string | null>(null);
   const [isCustomDialogOpen, setIsCustomDialogOpen] = useState(false);
   const [hasCustomKey, setHasCustomKey] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     async function fetchModels() {
@@ -50,6 +51,23 @@ export const ModelSelector = ({ selectedModel, onModelChange }: ModelSelectorPro
     setHasCustomKey(customApiKeyStorage.hasCustomKey());
   };
 
+  const filteredModels = models.filter(model => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      model.name.toLowerCase().includes(query) ||
+      model.description.toLowerCase().includes(query) ||
+      model.id.toLowerCase().includes(query)
+    );
+  });
+
+  const handleDropdownToggle = (open: boolean) => {
+    setIsOpen(open);
+    if (!open) {
+      setSearchQuery("");
+    }
+  };
+
   const currentModel = models.find(m => m.id === selectedModel) || models[0] || { id: selectedModel, name: selectedModel };
 
   if (loading) {
@@ -71,7 +89,7 @@ export const ModelSelector = ({ selectedModel, onModelChange }: ModelSelectorPro
   return (
     <div className="relative">
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => handleDropdownToggle(!isOpen)}
         className="flex items-center gap-2 px-3 py-2 text-sm bg-secondary rounded-md hover:bg-secondary/80 transition-colors"
       >
         <span className="font-medium">{currentModel.name}</span>
@@ -89,19 +107,44 @@ export const ModelSelector = ({ selectedModel, onModelChange }: ModelSelectorPro
         <>
           <div 
             className="fixed inset-0 z-40" 
-            onClick={() => setIsOpen(false)}
+            onClick={() => handleDropdownToggle(false)}
           />
-          <div className="absolute top-full right-0 mt-2 w-[calc(100vw-2rem)] sm:w-96 bg-popover border rounded-lg shadow-lg z-50 max-h-[500px] overflow-y-auto">
-            <div className="p-2">
-              <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
-                Free OpenRouter Models ({models.length})
+          <div className="absolute top-full right-0 mt-2 w-[calc(100vw-2rem)] sm:w-96 bg-popover border rounded-lg shadow-lg z-50 max-h-[500px] overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
+            <div className="p-2 border-b">
+              <div className="relative">
+                <svg
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+                <input
+                  type="text"
+                  placeholder="Search models..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-9 pr-3 py-2 text-sm bg-background border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+                />
               </div>
-              {models.length === 0 ? (
-                <div className="px-3 py-4 text-sm text-muted-foreground text-center">
-                  No models available
+            </div>
+            <div className="overflow-y-auto flex-1">
+              <div className="p-2">
+                <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
+                  Free OpenRouter Models ({filteredModels.length})
                 </div>
-              ) : (
-                models.map((model) => (
+                {filteredModels.length === 0 ? (
+                  <div className="px-3 py-4 text-sm text-muted-foreground text-center">
+                    No models found
+                  </div>
+                ) : (
+                  filteredModels.map((model) => (
                   <button
                     key={model.id}
                     onClick={() => {
@@ -128,8 +171,9 @@ export const ModelSelector = ({ selectedModel, onModelChange }: ModelSelectorPro
                       </div>
                     </div>
                   </button>
-                ))
-              )}
+                  ))
+                )}
+              </div>
             </div>
             <div className="border-t p-3 bg-muted/50">
               <p className="text-xs text-muted-foreground">
