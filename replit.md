@@ -5,6 +5,14 @@ This is an AI chat assistant application built with Next.js 15 and the assistant
 ## Recent Changes
 
 ### October 18, 2025
+- **Custom API Key Support**: Users can now use their own OpenRouter API keys
+  - **Custom Model Dialog**: Interactive dialog to enter and manage personal API keys
+  - **Visual Feedback**: "Active" indicator in model selector when custom key is set
+  - **Secure Storage**: API keys stored only in browser localStorage, never sent to our servers
+  - **Reactive Updates**: Automatic UI updates when keys are added/removed via custom events
+  - **Custom Model Selection**: Optional custom model ID field for accessing any OpenRouter model
+  - **Privacy-First**: Keys used only for direct OpenRouter API calls from the browser
+  - By default, uses the application's OpenRouter API key for free models
 - **Automatic Chat Title Generation**: AI-powered auto-titling feature (ChatGPT-style)
   - Automatically generates concise titles (5-7 words) from the first user message
   - Uses Mistral Small 3.1 free model via `/api/generate-title` endpoint
@@ -48,6 +56,7 @@ Preferred communication style: Simple, everyday language.
 - **Thread-based conversations**: Multiple conversation threads with persistence
 - **Automatic title generation**: AI-powered auto-titling from first user message (like ChatGPT)
 - **Model switching**: Dynamic model selection from free OpenRouter models
+- **Custom API Keys**: Users can bring their own OpenRouter keys for unlimited access
 - **Markdown rendering**: Full markdown support with syntax highlighting via react-shiki
 - **Attachment support**: File upload and display capabilities
 - **Responsive design**: Mobile-first with collapsible sidebar navigation
@@ -73,7 +82,8 @@ Preferred communication style: Simple, everyday language.
 - **Chat History Service**: CRUD operations in `/lib/chatHistory.ts`
 - **User Profile**: Display in sidebar with avatar and sign out capability
 - **Title Storage**: localStorage-based persistence in `/lib/titleStorage.ts` (works without authentication)
-- **Custom Event System**: 'chat-title-updated' events for reactive UI updates across components
+- **Custom API Key Storage**: localStorage-based storage in `/lib/customApiKey.ts` (browser-only, secure)
+- **Custom Event System**: 'chat-title-updated' and 'customApiKeyUpdated' events for reactive UI updates across components
 
 **State Management**:
 - Client-side: Zustand for runtime state
